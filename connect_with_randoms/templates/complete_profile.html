@@ -1,0 +1,155 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Profile - Elephant</title>
+
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: #080b12;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .box {
+            width: 400px;
+            max-width: 90%;
+            background: #111622;
+            padding: 30px;
+            border-radius: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .welcome {
+            text-align: center;
+            color: #9ca3af;
+        }
+
+        label {
+            display: block;
+            margin-top: 20px;
+            margin-bottom: 8px;
+        }
+
+        input[type="date"] {
+            width: 100%;
+            padding: 13px;
+            box-sizing: border-box;
+            border-radius: 10px;
+            border: 1px solid #303747;
+            background: #080b12;
+            color: white;
+        }
+
+        .gender {
+            display: flex;
+            gap: 10px;
+        }
+
+        .gender label {
+            flex: 1;
+            margin: 0;
+        }
+
+        .gender input {
+            margin-right: 6px;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            margin-top: 25px;
+            border: none;
+            border-radius: 10px;
+            background: #6366f1;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .error {
+            color: #f87171;
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .age {
+            color: #f59e0b;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 13px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="box">
+
+    <h1>Complete Profile</h1>
+
+    <div class="welcome">
+        Welcome, {{ profile.name }}
+    </div>
+
+    <form method="POST">
+
+        <label>Date of Birth</label>
+
+        <input
+            type="date"
+            name="dob"
+            required
+        >
+
+        <label>Gender</label>
+
+        <div class="gender">
+            <label>
+                <input
+                    type="radio"
+                    name="gender"
+                    value="male"
+                    required
+                >
+                Male
+            </label>
+
+            <label>
+                <input
+                    type="radio"
+                    name="gender"
+                    value="female"
+                >
+                Female
+            </label>
+        </div>
+
+        <button type="submit">
+            Continue
+        </button>
+
+    </form>
+
+    {% if error %}
+        <div class="error">{{ error }}</div>
+    {% endif %}
+
+    <div class="age">
+        🔞 Only users aged 18+ are allowed.
+    </div>
+
+</div>
+
+</body>
+</html>

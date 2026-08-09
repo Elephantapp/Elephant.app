@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connect With Randoms</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #111;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        header {
+            padding: 18px;
+            text-align: center;
+            background: #1b1b1b;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        #status {
+            text-align: center;
+            padding: 15px;
+            font-size: 18px;
+            color: #ccc;
+        }
+
+        .videos {
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .video-box {
+            position: relative;
+            width: min(45%, 600px);
+            min-width: 320px;
+            aspect-ratio: 16 / 9;
+            background: #222;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 2px solid #333;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background: #000;
+        }
+
+        .label {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: rgba(0,0,0,0.75);
+            padding: 7px 12px;
+            border-radius: 8px;
+            z-index: 2;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            padding: 20px;
+        }
+
+        button {
+            border: none;
+            padding: 13px 22px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        #micBtn,
+        #cameraBtn {
+            background: #333;
+            color: white;
+        }
+
+        #nextBtn {
+            background: #2196f3;
+            color: white;
+        }
+
+        #endBtn {
+            background: #e53935;
+            color: white;
+        }
+
+        button:hover {
+            opacity: 0.85;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>Connect With Randoms</h1>
+</header>
+
+<div id="status">
+    Starting camera...
+</div>
+
+<div class="videos">
+
+    <div class="video-box">
+        <div class="label">📹 Your Video</div>
+        <video id="localVideo" autoplay muted playsinline></video>
+    </div>
+
+    <div class="video-box">
+        <div class="label">👤 Random Video</div>
+        <video id="remoteVideo" autoplay playsinline></video>
+    </div>
+
+</div>
+
+<div class="controls">
+
+    <button id="micBtn">🎤 Mic On</button>
+
+    <button id="cameraBtn">📹 Camera On</button>
+
+    <button id="nextBtn">🔀 Next</button>
+
+    <button id="endBtn">❌ End</button>
+
+</div>
+
+
+<script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+
+<script>
+
+const socket = io();
+
+const localVideo = document.getElementById("localVideo");
+const remoteVideo = document.getElementById("remoteVideo");
+
+const statusText = document.getElementById("status");
+
+const micBtn = document.getElementById("micBtn");
+const cameraBtn = document.getElementById("cameraBtn");
+const nextBtn = document.getElementById("nextBtn");
+const endBtn = document.getElementById("endBtn");
+
+let localStream = null;
+let peerConnection = null;
+let partnerId = null;
+
+let micEnabled = true;
+let cameraEnabled = true;
+
+
+// =====================================
+// WEBRTC CONFIG
+// =====================================
+
+const rtcConfig = {
+
+    iceServers: [
+        {
+            urls: "stun:stun.l.google.com:19302"
+        }
+    ]
+
+};
+
+
+// =====================================
+// CAMERA
+// =====================================
+
+async function startCamera() {
+
+    try {
+
+        localStream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: true
+        });
+
+        localVideo.srcObject = localStream;
+
+        statusText.textContent = "Ready to connect";
+
+        console.log("Camera ready");
+
+    } catch (error) {
+
+        console.error(error);
+
+        statusText.textContent =
+            "Camera permission required";
+
+        alert(
+            "Camera aur microphone ki permission Allow karo."
+        );
+    }
+}
+
+
+// =====================================
+// CREATE PEER CONNECTION
+// =====================================
+
+function createPeerConnection() {
+
+    peerConnection = new RTCPeerConnection(rtcConfig);
+
+
+    // Local tracks
+    if (localStream) {
+
+        localStream.getTracks().forEach(function(track) {
+
+            peerConnection.addTrack(
+                track,
+                localStream
+            );
+
+        });
+
+    }
+
+
+    // Remote video
+    peerConnection.ontrack = function(event) {
+
+        console.log("Remote track received");
+
+        if (event.streams && event.streams[0]) {
+
+            remoteVideo.srcObject = event.streams[0];
+
+        }
+
+    };
+
+
+    // ICE candidates
+    peerConnection.onicecandidate = function(event) {
+
+        if (event.candidate && partnerId) {
+
+            socket.emit(
+                "ice_candidate",
+                {
+                    target: partnerId,
+                    candidate: event.candidate
+                }
+            );
+
+        }
+
+    };
+
+
+    peerConnection.onconnectionstatechange = function() {
+
+        console.log(
+            "Connection:",
+            peerConnection.connectionState
+        );
+
+        if (
+            peerConnection.connectionState === "connected"
+        ) {
+
+            statusText.textContent =
+                "Connected with a random person 🎉";
+
+        }
+
+        if (
+            peerConnection.connectionState === "disconnected" ||
+            peerConnection.connectionState === "failed"
+        ) {
+
+            statusText.textContent =
+                "Connection ended";
+
+        }
+
+    };
+
+}
+
+
+// =====================================
+// NEXT / FIND RANDOM
+// =====================================
+
+nextBtn.addEventListener("click", function() {
+
+    cleanupConnection();
+
+    statusText.textContent =
+        "Finding a random person...";
+
+    socket.emit("find_random");
+
+});
+
+
+// =====================================
+// MATCHED
+// =====================================
+
+socket.on("matched", async function(data) {
+
+    console.log("Matched:", data);
+
+    partnerId = data.partner_sid || null;
+
+    createPeerConnection();
+
+    statusText.textContent =
+        "Random person found! Connecting...";
+
+
+    // Initiator creates offer
+    if (data.initiator) {
+
+        const offer =
+            await peerConnection.createOffer();
+
+        await peerConnection.setLocalDescription(
+            offer
+        );
+
+
+        // Server currently needs target.
+        // We get partner through the signaling flow.
+        socket.emit(
+            "request_partner",
+            {}
+        );
+
+    }
+
+});
+
+
+// =====================================
+// WAITING
+// =====================================
+
+socket.on("waiting", function() {
+
+    statusText.textContent =
+        "Waiting for a random person...";
+
+});
+
+
+// =====================================
+// OFFER
+// =====================================
+
+socket.on("offer", async function(data) {
+
+    console.log("Offer received");
+
+    partnerId = data.from;
+
+    if (!peerConnection) {
+
+        createPeerConnection();
+
+    }
+
+    await peerConnection.setRemoteDescription(
+        new RTCSessionDescription(data.offer)
+    );
+
+
+    const answer =
+        await peerConnection.createAnswer();
+
+    await peerConnection.setLocalDescription(
+        answer
+    );
+
+
+    socket.emit(
+        "answer",
+        {
+            target: partnerId,
+            answer: answer
+        }
+    );
+
+});
+
+
+// =====================================
+// ANSWER
+// =====================================
+
+socket.on("answer", async function(data) {
+
+    console.log("Answer received");
+
+    partnerId = data.from;
+
+    if (!peerConnection) {
+        return;
+    }
+
+    await peerConnection.setRemoteDescription(
+        new RTCSessionDescription(data.answer)
+    );
+
+});
+
+
+// =====================================
+// ICE CANDIDATE
+// =====================================
+
+socket.on("ice_candidate", async function(data) {
+
+    console.log("ICE candidate received");
+
+    partnerId = data.from;
+
+    if (!peerConnection) {
+        return;
+    }
+
+    try {
+
+        await peerConnection.addIceCandidate(
+            new RTCIceCandidate(data.candidate)
+        );
+
+    } catch (error) {
+
+        console.error(
+            "ICE error:",
+            error
+        );
+
+    }
+
+});
+
+
+// =====================================
+// MIC
+// =====================================
+
+micBtn.addEventListener("click", function() {
+
+    if (!localStream) {
+        return;
+    }
+
+    const tracks =
+        localStream.getAudioTracks();
+
+    micEnabled = !micEnabled;
+
+    tracks.forEach(function(track) {
+
+        track.enabled = micEnabled;
+
+    });
+
+    micBtn.textContent =
+        micEnabled
+            ? "🎤 Mic On"
+            : "🔇 Mic Off";
+
+});
+
+
+// =====================================
+// CAMERA
+// =====================================
+
+cameraBtn.addEventListener("click", function() {
+
+    if (!localStream) {
+        return;
+    }
+
+    const tracks =
+        localStream.getVideoTracks();
+
+    cameraEnabled = !cameraEnabled;
+
+    tracks.forEach(function(track) {
+
+        track.enabled = cameraEnabled;
+
+    });
+
+    cameraBtn.textContent =
+        cameraEnabled
+            ? "📹 Camera On"
+            : "📷 Camera Off";
+
+});
+
+
+// =====================================
+// END CALL
+// =====================================
+
+endBtn.addEventListener("click", function() {
+
+    if (partnerId) {
+
+        socket.emit(
+            "end_call",
+            {
+                target: partnerId
+            }
+        );
+
+    }
+
+    cleanupConnection();
+
+    statusText.textContent =
+        "Call ended";
+
+});
+
+
+// =====================================
+// PARTNER ENDED
+// =====================================
+
+socket.on("partner_ended", function() {
+
+    cleanupConnection();
+
+    statusText.textContent =
+        "Random person ended the call";
+
+});
+
+
+// =====================================
+// CLEANUP
+// =====================================
+
+function cleanupConnection() {
+
+    if (peerConnection) {
+
+        peerConnection.close();
+
+        peerConnection = null;
+
+    }
+
+    remoteVideo.srcObject = null;
+
+    partnerId = null;
+
+}
+
+
+// =====================================
+// START
+// =====================================
+
+startCamera();
+
+</script>
+
+</body>
+</html>
