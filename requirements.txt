@@ -5,3 +5,4 @@ python-dotenv==1.2.2
 gunicorn
 simple-websocket==1.1.0
 requests==2.34.2
+requests
