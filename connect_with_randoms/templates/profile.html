@@ -44,7 +44,6 @@ body {
         sans-serif;
 
     min-height: 100vh;
-
 }
 
 
@@ -54,7 +53,7 @@ body {
 
 header {
 
-    background: rgba(15, 15, 15, .95);
+    background: rgba(15,15,15,.95);
 
     border-bottom:
         1px solid #292929;
@@ -74,7 +73,6 @@ header {
     z-index: 10;
 
     backdrop-filter: blur(10px);
-
 }
 
 .logo {
@@ -82,9 +80,6 @@ header {
     font-size: 21px;
 
     font-weight: bold;
-
-    letter-spacing: .3px;
-
 }
 
 .logout {
@@ -101,34 +96,23 @@ header {
     padding: 10px 15px;
 
     border-radius: 10px;
-
-    transition: .2s;
-
-}
-
-.logout:hover {
-
-    background: #333;
-
 }
 
 
 /* ==================================================
-   PAGE
+   CONTAINER
 ================================================== */
 
 .container {
 
     width: 100%;
 
-    max-width: 650px;
+    max-width: 900px;
 
     margin: 0 auto;
 
     padding:
-        35px 20px
-        50px;
-
+        35px 20px 60px;
 }
 
 
@@ -156,13 +140,7 @@ header {
 
     box-shadow:
         0 20px 60px rgba(0,0,0,.5);
-
 }
-
-
-/* ==================================================
-   PROFILE IMAGE
-================================================== */
 
 .profile-picture {
 
@@ -178,16 +156,7 @@ header {
         3px solid #444;
 
     background: #222;
-
-    box-shadow:
-        0 0 0 6px #171717;
-
 }
-
-
-/* ==================================================
-   NAME
-================================================== */
 
 .profile-card h1 {
 
@@ -195,7 +164,6 @@ header {
         22px 0 8px;
 
     font-size: 28px;
-
 }
 
 .email {
@@ -205,13 +173,7 @@ header {
     font-size: 15px;
 
     word-break: break-word;
-
 }
-
-
-/* ==================================================
-   DIVIDER
-================================================== */
 
 .divider {
 
@@ -221,12 +183,11 @@ header {
 
     margin:
         28px 0;
-
 }
 
 
 /* ==================================================
-   INFO
+   USER INFO
 ================================================== */
 
 .info {
@@ -238,7 +199,6 @@ header {
     flex-direction: column;
 
     gap: 12px;
-
 }
 
 .info-row {
@@ -251,7 +211,6 @@ header {
     border-radius: 13px;
 
     padding: 15px 16px;
-
 }
 
 .info-label {
@@ -265,7 +224,6 @@ header {
     letter-spacing: 1px;
 
     margin-bottom: 5px;
-
 }
 
 .info-value {
@@ -273,7 +231,6 @@ header {
     color: #eee;
 
     font-size: 16px;
-
 }
 
 
@@ -302,41 +259,198 @@ header {
     font-size: 17px;
 
     font-weight: bold;
-
-    transition: .2s;
-
-}
-
-.connect-btn:hover {
-
-    background: #ddd;
-
-    transform: translateY(-1px);
-
 }
 
 
 /* ==================================================
-   PREMIUM
+   PLANS
 ================================================== */
 
-.premium {
+.plans {
 
-    margin-top: 15px;
+    margin-top: 30px;
 
-    padding: 13px;
-
-    border-radius: 12px;
-
-    background: #171717;
+    background:
+        linear-gradient(
+            145deg,
+            #181818,
+            #0e0e0e
+        );
 
     border:
-        1px solid #303030;
+        1px solid #2d2d2d;
 
-    color: #aaa;
+    border-radius: 24px;
+
+    padding: 25px 20px;
+
+    box-shadow:
+        0 20px 60px rgba(0,0,0,.4);
+}
+
+.plans h2 {
+
+    text-align: center;
+
+    margin:
+        0 0 8px;
+
+    font-size: 25px;
+}
+
+.plans-subtitle {
+
+    text-align: center;
+
+    color: #888;
+
+    margin:
+        0 0 25px;
+
+    font-size: 14px;
+}
+
+
+/* ==================================================
+   PLAN GRID
+================================================== */
+
+.plan-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, 1fr);
+
+    gap: 18px;
+}
+
+.plan {
+
+    background: #111;
+
+    border:
+        1px solid #2d2d2d;
+
+    border-radius: 18px;
+
+    padding: 22px;
+
+}
+
+.plan.premium {
+
+    border:
+        1px solid #555;
+
+    background:
+        linear-gradient(
+            145deg,
+            #202020,
+            #111
+        );
+}
+
+.plan-title {
+
+    font-size: 22px;
+
+    font-weight: bold;
+
+    margin-bottom: 6px;
+}
+
+.plan-description {
+
+    color: #888;
+
+    font-size: 13px;
+
+    margin-bottom: 18px;
+}
+
+
+/* ==================================================
+   FEATURES
+================================================== */
+
+.feature {
+
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 9px;
+
+    padding:
+        9px 0;
+
+    border-bottom:
+        1px solid #222;
+
+    color: #ccc;
 
     font-size: 14px;
 
+    line-height: 1.4;
+}
+
+.feature:last-child {
+
+    border-bottom: none;
+}
+
+.check {
+
+    color: #6ee56e;
+
+    font-weight: bold;
+
+    flex-shrink: 0;
+}
+
+.cross {
+
+    color: #ff5c5c;
+
+    font-weight: bold;
+
+    flex-shrink: 0;
+}
+
+.limit {
+
+    color: #aaa;
+}
+
+
+/* ==================================================
+   PREMIUM BUTTON
+================================================== */
+
+.premium-btn {
+
+    display: block;
+
+    width: 100%;
+
+    margin-top: 20px;
+
+    padding: 14px;
+
+    border-radius: 12px;
+
+    background: #fff;
+
+    color: #000;
+
+    text-decoration: none;
+
+    text-align: center;
+
+    font-weight: bold;
+
+    font-size: 16px;
 }
 
 
@@ -344,36 +458,22 @@ header {
    MOBILE
 ================================================== */
 
-@media (max-width: 600px) {
+@media (max-width: 700px) {
 
     header {
 
-        padding:
-            15px;
-
+        padding: 15px;
     }
 
     .logo {
 
         font-size: 18px;
-
-    }
-
-    .logout {
-
-        padding:
-            9px 12px;
-
-        font-size: 14px;
-
     }
 
     .container {
 
         padding:
-            25px 15px
-            40px;
-
+            25px 14px 45px;
     }
 
     .profile-card {
@@ -382,7 +482,6 @@ header {
             30px 18px;
 
         border-radius: 20px;
-
     }
 
     .profile-picture {
@@ -390,13 +489,22 @@ header {
         width: 105px;
 
         height: 105px;
-
     }
 
     .profile-card h1 {
 
         font-size: 24px;
+    }
 
+    .plan-grid {
+
+        grid-template-columns: 1fr;
+    }
+
+    .plans {
+
+        padding:
+            22px 15px;
     }
 
 }
@@ -408,6 +516,10 @@ header {
 
 <body>
 
+
+<!-- ==================================================
+     HEADER
+================================================== -->
 
 <header>
 
@@ -427,93 +539,300 @@ header {
 
 <main class="container">
 
-    <div class="profile-card">
+
+<!-- ==================================================
+     PROFILE
+================================================== -->
+
+<div class="profile-card">
 
 
-        {% if user.picture %}
+    {% if user.picture %}
 
-            <img
-                src="{{ user.picture }}"
-                alt="Profile Picture"
-                class="profile-picture"
-            >
-
-        {% else %}
-
-            <div
-                class="profile-picture"
-                style="
-                    display:flex;
-                    align-items:center;
-                    justify-content:center;
-                    font-size:45px;
-                "
-            >
-                👤
-            </div>
-
-        {% endif %}
-
-
-        <h1>
-            {{ user.name }}
-        </h1>
-
-
-        <div class="email">
-            {{ user.email }}
-        </div>
-
-
-        <div class="divider"></div>
-
-
-        <div class="info">
-
-            <div class="info-row">
-
-                <div class="info-label">
-                    Name
-                </div>
-
-                <div class="info-value">
-                    {{ user.name }}
-                </div>
-
-            </div>
-
-
-            <div class="info-row">
-
-                <div class="info-label">
-                    Email
-                </div>
-
-                <div class="info-value">
-                    {{ user.email }}
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <a
-            href="/connect"
-            class="connect-btn"
+        <img
+            src="{{ user.picture }}"
+            alt="Profile Picture"
+            class="profile-picture"
         >
-            🔀 Connect With Randoms
-        </a>
+
+    {% else %}
+
+        <div
+            class="profile-picture"
+            style="
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                font-size:45px;
+            "
+        >
+            👤
+        </div>
+
+    {% endif %}
 
 
-        <div class="premium">
+    <h1>
+        {{ user.name }}
+    </h1>
 
-            ⭐ Premium features coming soon
+
+    <div class="email">
+        {{ user.email }}
+    </div>
+
+
+    <div class="divider"></div>
+
+
+    <div class="info">
+
+        <div class="info-row">
+
+            <div class="info-label">
+                Name
+            </div>
+
+            <div class="info-value">
+                {{ user.name }}
+            </div>
+
+        </div>
+
+
+        <div class="info-row">
+
+            <div class="info-label">
+                Email
+            </div>
+
+            <div class="info-value">
+                {{ user.email }}
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <a
+        href="/connect"
+        class="connect-btn"
+    >
+        🔀 Connect With Randoms
+    </a>
+
+</div>
+
+
+<!-- ==================================================
+     FREE VS PREMIUM
+================================================== -->
+
+<section class="plans">
+
+    <h2>
+        Free vs Premium
+    </h2>
+
+    <p class="plans-subtitle">
+        Compare what you get with each plan.
+    </p>
+
+
+    <div class="plan-grid">
+
+
+        <!-- ==============================
+             FREE
+        =============================== -->
+
+        <div class="plan">
+
+            <div class="plan-title">
+                Free
+            </div>
+
+            <div class="plan-description">
+                Basic access
+            </div>
+
+
+            <div class="feature">
+                <span class="check">✓</span>
+                <span>Google Login</span>
+            </div>
+
+
+            <div class="feature">
+                <span class="check">✓</span>
+                <span>Gender Selection</span>
+            </div>
+
+
+            <div class="feature">
+                <span class="check">✓</span>
+                <span>Male → Male Matching</span>
+            </div>
+
+
+            <div class="feature">
+                <span class="cross">✕</span>
+                <span>Male → Female Matching</span>
+            </div>
+
+
+            <div class="feature">
+                <span class="limit">•</span>
+                <span>Random Video Chat — Limited</span>
+            </div>
+
+
+            <div class="feature">
+                <span class="limit">•</span>
+                <span>Female Connections — 2–3 Initial Connections</span>
+            </div>
+
+
+            <div class="feature">
+                <span class="limit">•</span>
+                <span>150 Connections Ke Baad — Premium Required</span>
+            </div>
+
+
+            <div class="feature">
+                <span class="limit">•</span>
+                <span>Text Chat — 1000 Words</span>
+            </div>
+
+
+            <div class="feature">
+                <span class="limit">•</span>
+                <span>Voice / Video — Limited</span>
+            </div>
+
+
+            <div class="feature">
+                <span class="limit">•</span>
+                <span>Skip / Next — Limited</span>
+            </div>
+
+
+            <div class="feature">
+                <span class="check">✓</span>
+                <span>Report / Block</span>
+            </div>
+
+
+            <div class="feature">
+                <span class="check">✓</span>
+                <span>Social Accounts Sharing</span>
+            </div>
+
+        </div>
+
+
+        <!-- ==============================
+             PREMIUM
+        =============================== -->
+
+        <div class="plan premium">
+
+            <div class="plan-title">
+                ⭐ Premium
+            </div>
+
+            <div class="plan-description">
+                Unlimited experience
+            </div>
+
+
+            <div class="feature">
+                <span class="check">✓</span>
+                <span>Google Login</span>
+            </div>
+
+
+            <div class="feature">
+                <span class="check">✓</span>
+                <span>Gender Selection</span>
+            </div>
+
+
+            <div class="feature">
+                <span class="check">✓</span>
+                <span>Unlimited Random Video Chat</span>
+            </div>
+
+
+            <div class="feature">
+                <span class="check">✓</span>
+                <span>Male → Male Matching</span>
+            </div>
+
+
+            <div class="feature">
+                <span class="check">✓</span>
+                <span>Male → Female Matching</span>
+            </div>
+
+
+            <div class="feature">
+                <span class="check">✓</span>
+                <span>Female Connections — Unlimited</span>
+            </div>
+
+
+            <div class="feature">
+                <span class="check">✓</span>
+                <span>150 Connections Ke Baad — Continue</span>
+            </div>
+
+
+            <div class="feature">
+                <span class="check">✓</span>
+                <span>Text Chat — Unlimited</span>
+            </div>
+
+
+            <div class="feature">
+                <span class="check">✓</span>
+                <span>Voice / Video — Unlimited</span>
+            </div>
+
+
+            <div class="feature">
+                <span class="check">✓</span>
+                <span>Skip / Next — Unlimited</span>
+            </div>
+
+
+            <div class="feature">
+                <span class="check">✓</span>
+                <span>Report / Block</span>
+            </div>
+
+
+            <div class="feature">
+                <span class="check">✓</span>
+                <span>Social Accounts Sharing</span>
+            </div>
+
+
+            <a
+                href="/premium"
+                class="premium-btn"
+            >
+                ⭐ Upgrade to Premium
+            </a>
 
         </div>
 
 
     </div>
+
+</section>
+
 
 </main>
 
