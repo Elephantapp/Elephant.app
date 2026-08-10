@@ -2,1317 +2,1875 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Connect With Randoms</title>
+<meta charset="UTF-8">
 
-    <!-- IMPORTANT: Socket.IO CDN -->
-    <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+>
 
-    <style>
-        * {
-            box-sizing: border-box;
-        }
+<title>Connect With Randoms</title>
 
-        body {
-            margin: 0;
-            background: #111;
-            color: white;
-            font-family: Arial, sans-serif;
-        }
+<script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
 
-        header {
-            padding: 18px;
-            text-align: center;
-            background: #1b1b1b;
-        }
+<style>
 
-        header h1 {
-            margin: 0;
-            font-size: 28px;
-        }
+* {
+    box-sizing: border-box;
+}
 
-        #status {
-            text-align: center;
-            padding: 15px;
-            font-size: 18px;
-            color: #ccc;
-        }
+html,
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+    background: #111;
+    color: white;
+    font-family: Arial, sans-serif;
+}
 
-        .videos {
-            display: flex;
-            gap: 20px;
-            padding: 20px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
+body {
+    overflow-x: hidden;
+}
 
-        .video-box {
-            position: relative;
-            width: min(45%, 600px);
-            min-width: 320px;
-            aspect-ratio: 16 / 9;
-            background: #222;
-            border-radius: 15px;
-            overflow: hidden;
-            border: 2px solid #333;
-        }
+button {
+    border: none;
+    border-radius: 12px;
+    padding: 14px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    touch-action: manipulation;
+}
 
-        video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            background: #000;
-        }
+button:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+}
 
-        .label {
-            position: absolute;
-            top: 12px;
-            left: 12px;
-            background: rgba(0, 0, 0, 0.75);
-            padding: 7px 12px;
-            border-radius: 8px;
-            z-index: 2;
-        }
 
-        .controls {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            flex-wrap: wrap;
-            padding: 20px;
-        }
+/* ==================================================
+   PERMISSION SCREEN
+================================================== */
 
-        button {
-            border: none;
-            padding: 13px 22px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-        }
+#permissionScreen {
 
-        button:hover {
-            opacity: 0.85;
-        }
+    min-height: 100svh;
 
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
+    display: flex;
 
-        #permissionBtn {
-            background: #4caf50;
-            color: white;
-        }
+    align-items: center;
 
-        #micBtn,
-        #cameraBtn {
-            background: #333;
-            color: white;
-        }
+    justify-content: center;
 
-        #findBtn {
-            background: #4caf50;
-            color: white;
-        }
+    padding:
+        20px
+        20px
+        calc(20px + env(safe-area-inset-bottom));
 
-        #nextBtn {
-            background: #2196f3;
-            color: white;
-        }
+}
 
-        #endBtn {
-            background: #e53935;
-            color: white;
-        }
+.permission-box {
 
-        #permissionScreen {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
+    width: 100%;
 
-        .permission-box {
-            width: 100%;
-            max-width: 500px;
-            background: #1b1b1b;
-            padding: 35px;
-            border-radius: 20px;
-            text-align: center;
-        }
+    max-width: 520px;
 
-        .permission-box h2 {
-            margin-top: 0;
-        }
+    background: #1b1b1b;
 
-        .permission-box p {
-            color: #aaa;
-            line-height: 1.6;
-        }
+    padding: 30px 22px;
 
-        #permissionStatus {
-            margin-top: 15px;
-            color: #aaa;
-        }
+    border-radius: 20px;
 
-        #mainApp {
-            display: none;
-        }
+    text-align: center;
 
-        @media (max-width: 700px) {
-            .video-box {
-                width: 95%;
-                min-width: 0;
-            }
+    box-shadow:
+        0 10px 40px rgba(0,0,0,.35);
 
-            .controls button {
-                width: 90%;
-            }
+}
 
-            header h1 {
-                font-size: 23px;
-            }
-        }
-    </style>
+.permission-box h2 {
+
+    margin-top: 0;
+
+    font-size: 24px;
+
+}
+
+.permission-box p {
+
+    color: #aaa;
+
+    line-height: 1.6;
+
+}
+
+#permissionBtn {
+
+    width: 100%;
+
+    margin-top: 12px;
+
+    background: #4caf50;
+
+    color: white;
+
+}
+
+#permissionStatus {
+
+    margin-top: 16px;
+
+    color: #aaa;
+
+    line-height: 1.5;
+
+}
+
+
+/* ==================================================
+   MAIN APP
+================================================== */
+
+#mainApp {
+    display: none;
+}
+
+header {
+
+    background: #1b1b1b;
+
+    padding:
+        18px
+        15px
+        calc(18px + env(safe-area-inset-top));
+
+    text-align: center;
+
+}
+
+header h1 {
+
+    margin: 0;
+
+    font-size: 26px;
+
+}
+
+#status {
+
+    text-align: center;
+
+    padding: 18px 12px;
+
+    font-size: 17px;
+
+    color: #ccc;
+
+    min-height: 55px;
+
+}
+
+
+/* ==================================================
+   VIDEOS
+================================================== */
+
+.videos {
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: flex-start;
+
+    gap: 20px;
+
+    padding: 15px;
+
+    flex-wrap: wrap;
+
+}
+
+.video-box {
+
+    position: relative;
+
+    width: min(46%, 600px);
+
+    aspect-ratio: 16 / 9;
+
+    background: #000;
+
+    border: 2px solid #333;
+
+    border-radius: 15px;
+
+    overflow: hidden;
+
+}
+
+video {
+
+    width: 100%;
+
+    height: 100%;
+
+    object-fit: cover;
+
+    background: #000;
+
+}
+
+#remoteVideo {
+
+    transform: translateZ(0);
+
+}
+
+.label {
+
+    position: absolute;
+
+    top: 10px;
+
+    left: 10px;
+
+    background: rgba(0,0,0,.7);
+
+    padding: 7px 10px;
+
+    border-radius: 8px;
+
+    z-index: 2;
+
+}
+
+
+/* ==================================================
+   CONTROLS
+================================================== */
+
+.controls {
+
+    display: flex;
+
+    justify-content: center;
+
+    gap: 12px;
+
+    flex-wrap: wrap;
+
+    padding:
+        15px
+        15px
+        calc(25px + env(safe-area-inset-bottom));
+
+}
+
+#micBtn,
+#cameraBtn {
+
+    background: #333;
+
+    color: white;
+
+}
+
+#findBtn {
+
+    background: #4caf50;
+
+    color: white;
+
+}
+
+#nextBtn {
+
+    background: #2196f3;
+
+    color: white;
+
+}
+
+#endBtn {
+
+    background: #e53935;
+
+    color: white;
+
+}
+
+
+/* ==================================================
+   MOBILE
+================================================== */
+
+@media (max-width: 700px) {
+
+    header h1 {
+        font-size: 22px;
+    }
+
+    .videos {
+
+        padding: 10px;
+
+        gap: 12px;
+
+    }
+
+    .video-box {
+
+        width: 100%;
+
+        max-width: 650px;
+
+        border-radius: 12px;
+
+    }
+
+    .controls {
+
+        padding-left: 20px;
+
+        padding-right: 20px;
+
+    }
+
+    .controls button {
+
+        width: 100%;
+
+        min-height: 48px;
+
+    }
+
+    #status {
+
+        font-size: 15px;
+
+    }
+
+}
+
+
+/* ==================================================
+   VERY SMALL PHONES
+================================================== */
+
+@media (max-width: 380px) {
+
+    .permission-box {
+
+        padding: 25px 17px;
+
+    }
+
+    .permission-box h2 {
+
+        font-size: 21px;
+
+    }
+
+}
+
+</style>
+
 </head>
+
 
 <body>
 
-    <!-- PERMISSION SCREEN -->
 
-    <div id="permissionScreen">
+<!-- ==================================================
+     PERMISSION
+================================================== -->
 
-        <div class="permission-box">
+<div id="permissionScreen">
 
-            <h2>🎥🎤 Camera & Microphone Required</h2>
+    <div class="permission-box">
 
-            <p>
-                Connect With Randoms use karne ke liye
-                Camera aur Microphone permission required hai.
-                <br><br>
-                Neeche button dabao aur browser mein
-                <b>Allow</b> select karo.
-            </p>
+        <h2>
+            🎥🎤 Camera & Microphone
+        </h2>
 
-            <button id="permissionBtn">
-                Allow Camera & Microphone
-            </button>
+        <p>
 
-            <div id="permissionStatus"></div>
+            Connect With Randoms use karne ke liye
+            Camera aur Microphone permission required hai.
 
+            <br><br>
+
+            <b>Allow Camera & Microphone</b>
+            button dabao aur browser mein
+            <b>Allow</b> select karo.
+
+        </p>
+
+        <button id="permissionBtn">
+
+            Allow Camera & Microphone
+
+        </button>
+
+        <div id="permissionStatus"></div>
+
+    </div>
+
+</div>
+
+
+<!-- ==================================================
+     MAIN APP
+================================================== -->
+
+<div id="mainApp">
+
+<header>
+
+    <h1>
+        Connect With Randoms
+    </h1>
+
+</header>
+
+
+<div id="status">
+    Connecting to server...
+</div>
+
+
+<div class="videos">
+
+    <div class="video-box">
+
+        <div class="label">
+            📹 Your Video
         </div>
+
+        <video
+            id="localVideo"
+            autoplay
+            muted
+            playsinline
+            webkit-playsinline>
+        </video>
 
     </div>
 
 
-    <!-- MAIN APP -->
+    <div class="video-box">
 
-    <div id="mainApp">
-
-        <header>
-            <h1>Connect With Randoms</h1>
-        </header>
-
-        <div id="status">
-            Camera aur microphone ready karo.
+        <div class="label">
+            👤 Random Video
         </div>
 
-        <div class="videos">
-
-            <div class="video-box">
-
-                <div class="label">
-                    📹 Your Video
-                </div>
-
-                <video
-                    id="localVideo"
-                    autoplay
-                    muted
-                    playsinline>
-                </video>
-
-            </div>
-
-
-            <div class="video-box">
-
-                <div class="label">
-                    👤 Random Video
-                </div>
-
-                <video
-                    id="remoteVideo"
-                    autoplay
-                    playsinline>
-                </video>
-
-            </div>
-
-        </div>
-
-
-        <div class="controls">
-
-            <button id="micBtn">
-                🎤 Mic On
-            </button>
-
-            <button id="cameraBtn">
-                📹 Camera On
-            </button>
-
-            <button id="findBtn">
-                🔀 Find Random
-            </button>
-
-            <button id="nextBtn">
-                ➡️ Next
-            </button>
-
-            <button id="endBtn">
-                ❌ End
-            </button>
-
-        </div>
+        <video
+            id="remoteVideo"
+            autoplay
+            playsinline
+            webkit-playsinline
+            controls="false">
+        </video>
 
     </div>
 
+</div>
 
-    <script>
 
-        /* =====================================================
-           CHECK SOCKET.IO CLIENT
-        ===================================================== */
+<div class="controls">
 
-        if (typeof io === "undefined") {
+    <button id="micBtn">
+        🎤 Mic On
+    </button>
 
-            document.getElementById("permissionStatus").innerText =
-                "❌ Socket.IO load nahi hua. Page refresh karo.";
+    <button id="cameraBtn">
+        📹 Camera On
+    </button>
 
-            console.error("Socket.IO client is NOT loaded.");
+    <button id="findBtn">
+        🔀 Find Random
+    </button>
 
-        } else {
+    <button id="nextBtn">
+        ➡️ Next
+    </button>
 
-            console.log("Socket.IO client loaded:", io.version);
+    <button id="endBtn">
+        ❌ End
+    </button>
+
+</div>
+
+</div>
+
+
+<script>
+
+/* ==================================================
+   SOCKET
+================================================== */
+
+const socket = io({
+    transports: ["polling", "websocket"],
+    upgrade: true,
+    reconnection: true,
+    reconnectionAttempts: Infinity,
+    reconnectionDelay: 1000,
+    reconnectionDelayMax: 5000,
+    timeout: 20000
+});
+
+
+/* ==================================================
+   ELEMENTS
+================================================== */
+
+const permissionScreen =
+    document.getElementById("permissionScreen");
+
+const permissionBtn =
+    document.getElementById("permissionBtn");
+
+const permissionStatus =
+    document.getElementById("permissionStatus");
+
+const mainApp =
+    document.getElementById("mainApp");
+
+const localVideo =
+    document.getElementById("localVideo");
+
+const remoteVideo =
+    document.getElementById("remoteVideo");
+
+const statusText =
+    document.getElementById("status");
+
+const micBtn =
+    document.getElementById("micBtn");
+
+const cameraBtn =
+    document.getElementById("cameraBtn");
+
+const findBtn =
+    document.getElementById("findBtn");
+
+const nextBtn =
+    document.getElementById("nextBtn");
+
+const endBtn =
+    document.getElementById("endBtn");
+
+
+/* ==================================================
+   VARIABLES
+================================================== */
+
+let localStream = null;
+
+let peerConnection = null;
+
+let partnerSid = null;
+
+let searching = false;
+
+let remoteDescriptionReady = false;
+
+let pendingIceCandidates = [];
+
+let mediaReady = false;
+
+
+/* ==================================================
+   WEBRTC
+================================================== */
+
+const rtcConfig = {
+
+    iceServers: [
+
+        {
+            urls: "stun:stun.l.google.com:19302"
+        },
+
+        {
+            urls: "stun:stun1.l.google.com:19302"
+        }
+
+    ]
+
+};
+
+
+/*
+==================================================
+OPTIONAL TURN SERVER
+
+If you later add TURN credentials in HTML,
+add another iceServers entry here.
+
+TURN is strongly recommended for production
+mobile networks.
+==================================================
+*/
+
+
+/* ==================================================
+   STATUS
+================================================== */
+
+function setStatus(message) {
+
+    statusText.innerText = message;
+
+}
+
+
+/* ==================================================
+   SOCKET STATUS
+================================================== */
+
+socket.on("connect", () => {
+
+    console.log(
+        "SOCKET CONNECTED:",
+        socket.id
+    );
+
+    if (!mediaReady) {
+
+        permissionStatus.innerText =
+            "Server connected. Camera aur microphone allow karo.";
+
+    }
+
+});
+
+
+socket.on("disconnect", reason => {
+
+    console.log(
+        "SOCKET DISCONNECTED:",
+        reason
+    );
+
+    if (mainApp.style.display === "block") {
+
+        setStatus(
+            "⚠️ Server connection lost. Reconnecting..."
+        );
+
+    }
+
+});
+
+
+socket.on("connect_error", error => {
+
+    console.error(
+        "SOCKET ERROR:",
+        error
+    );
+
+    if (mediaReady) {
+
+        setStatus(
+            "❌ Server connection failed. Retrying..."
+        );
+
+    } else {
+
+        permissionStatus.innerText =
+            "⚠️ Server se connect nahi ho pa raha. Internet check karo.";
+
+    }
+
+});
+
+
+/* ==================================================
+   MEDIA ERROR MESSAGE
+================================================== */
+
+function getMediaErrorMessage(error) {
+
+    if (!error) {
+
+        return "Camera aur microphone access nahi mil saka.";
+
+    }
+
+
+    switch (error.name) {
+
+        case "NotAllowedError":
+
+            return (
+                "❌ Camera/Microphone permission blocked hai. "
+                + "Browser settings mein is site ke Camera aur Microphone ko Allow karo."
+            );
+
+
+        case "PermissionDeniedError":
+
+            return (
+                "❌ Camera/Microphone permission denied hai. "
+                + "Browser settings mein permission Allow karo."
+            );
+
+
+        case "NotFoundError":
+
+            return (
+                "❌ Camera ya microphone device nahi mila."
+            );
+
+
+        case "NotReadableError":
+
+            return (
+                "❌ Camera/Microphone kisi doosri app mein use ho raha hai."
+            );
+
+
+        case "OverconstrainedError":
+
+            return (
+                "❌ Camera ki requested setting supported nahi hai. "
+                + "Basic camera mode try kar raha hoon."
+            );
+
+
+        case "SecurityError":
+
+            return (
+                "❌ Browser ne camera/microphone access block kar diya."
+            );
+
+
+        case "AbortError":
+
+            return (
+                "❌ Camera access interrupted. Dobara try karo."
+            );
+
+
+        case "TypeError":
+
+            return (
+                "❌ Camera/Microphone API available nahi hai."
+            );
+
+
+        default:
+
+            return (
+                "❌ "
+                + error.name
+                + ": "
+                + error.message
+            );
+
+    }
+
+}
+
+
+/* ==================================================
+   CAMERA + MICROPHONE
+================================================== */
+
+async function requestMedia() {
+
+    permissionBtn.disabled = true;
+
+    permissionBtn.innerText =
+        "Requesting permission...";
+
+    permissionStatus.innerText =
+        "Browser permission popup ka wait karo...";
+
+
+    /*
+    ----------------------------------------------
+    HTTPS CHECK
+    ----------------------------------------------
+    */
+
+    if (!window.isSecureContext) {
+
+        permissionStatus.innerText =
+            "❌ HTTPS required hai. Render wali HTTPS website open karo.";
+
+        permissionBtn.disabled = false;
+
+        permissionBtn.innerText =
+            "🎥 Try Again";
+
+        return;
+
+    }
+
+
+    /*
+    ----------------------------------------------
+    MEDIA API CHECK
+    ----------------------------------------------
+    */
+
+    if (
+        !navigator.mediaDevices ||
+        !navigator.mediaDevices.getUserMedia
+    ) {
+
+        permissionStatus.innerText =
+            "❌ Is browser mein camera/microphone access available nahi hai.";
+
+        permissionBtn.disabled = false;
+
+        permissionBtn.innerText =
+            "🎥 Try Again";
+
+        return;
+
+    }
+
+
+    /*
+    ----------------------------------------------
+    STOP OLD STREAM
+    ----------------------------------------------
+    */
+
+    if (localStream) {
+
+        localStream
+            .getTracks()
+            .forEach(track => track.stop());
+
+        localStream = null;
+
+    }
+
+
+    try {
+
+        /*
+        ------------------------------------------
+        FIRST ATTEMPT
+        ------------------------------------------
+        */
+
+        localStream =
+            await navigator.mediaDevices.getUserMedia({
+
+                video: {
+                    facingMode: "user"
+                },
+
+                audio: true
+
+            });
+
+
+    } catch (firstError) {
+
+        console.error(
+            "FIRST MEDIA ERROR:",
+            firstError
+        );
+
+
+        /*
+        ------------------------------------------
+        SECOND SIMPLE ATTEMPT
+        ------------------------------------------
+        */
+
+        try {
+
+            localStream =
+                await navigator.mediaDevices.getUserMedia({
+
+                    video: true,
+
+                    audio: true
+
+                });
+
+        } catch (secondError) {
+
+            console.error(
+                "SECOND MEDIA ERROR:",
+                secondError
+            );
+
+            permissionStatus.innerText =
+                getMediaErrorMessage(
+                    secondError
+                );
+
+            permissionBtn.disabled = false;
+
+            permissionBtn.innerText =
+                "🎥 Try Again";
+
+            return;
 
         }
 
-
-        /* =====================================================
-           SOCKET CONNECTION
-        ===================================================== */
-
-        const socket = io({
-            transports: ["websocket", "polling"]
-        });
+    }
 
 
-        /* =====================================================
-           ELEMENTS
-        ===================================================== */
+    /*
+    ----------------------------------------------
+    MEDIA SUCCESS
+    ----------------------------------------------
+    */
 
-        const permissionScreen =
-            document.getElementById("permissionScreen");
-
-        const permissionBtn =
-            document.getElementById("permissionBtn");
-
-        const permissionStatus =
-            document.getElementById("permissionStatus");
-
-        const mainApp =
-            document.getElementById("mainApp");
-
-        const localVideo =
-            document.getElementById("localVideo");
-
-        const remoteVideo =
-            document.getElementById("remoteVideo");
-
-        const statusText =
-            document.getElementById("status");
-
-        const micBtn =
-            document.getElementById("micBtn");
-
-        const cameraBtn =
-            document.getElementById("cameraBtn");
-
-        const findBtn =
-            document.getElementById("findBtn");
-
-        const nextBtn =
-            document.getElementById("nextBtn");
-
-        const endBtn =
-            document.getElementById("endBtn");
+    mediaReady = true;
 
 
-        /* =====================================================
-           VARIABLES
-        ===================================================== */
-
-        let localStream = null;
-        let peerConnection = null;
-        let partnerSid = null;
-        let searching = false;
-
-        let remoteDescriptionReady = false;
-        let pendingIceCandidates = [];
+    localVideo.srcObject =
+        localStream;
 
 
-        /* =====================================================
-           WEBRTC
-        ===================================================== */
+    localVideo.muted = true;
 
-        const rtcConfig = {
+    localVideo.playsInline = true;
 
-            iceServers: [
 
-                {
-                    urls: "stun:stun.l.google.com:19302"
-                },
+    try {
 
-                {
-                    urls: "stun:stun1.l.google.com:19302"
+        await localVideo.play();
+
+    } catch (error) {
+
+        console.log(
+            "LOCAL VIDEO PLAY:",
+            error
+        );
+
+    }
+
+
+    permissionScreen.style.display =
+        "none";
+
+    mainApp.style.display =
+        "block";
+
+
+    setStatus(
+        "🔎 Finding a random person..."
+    );
+
+
+    /*
+    ----------------------------------------------
+    WAIT FOR SOCKET
+    ----------------------------------------------
+    */
+
+    if (socket.connected) {
+
+        searching = true;
+
+        socket.emit(
+            "find_random"
+        );
+
+    } else {
+
+        setStatus(
+            "🔄 Connecting to server..."
+        );
+
+    }
+
+}
+
+
+/* ==================================================
+   PERMISSION BUTTON
+================================================== */
+
+permissionBtn.addEventListener(
+    "click",
+    requestMedia
+);
+
+
+/* ==================================================
+   CREATE PEER CONNECTION
+================================================== */
+
+function createPeerConnection() {
+
+    closePeerConnection();
+
+
+    remoteDescriptionReady =
+        false;
+
+    pendingIceCandidates = [];
+
+
+    peerConnection =
+        new RTCPeerConnection(
+            rtcConfig
+        );
+
+
+    /*
+    ----------------------------------------------
+    LOCAL TRACKS
+    ----------------------------------------------
+    */
+
+    if (localStream) {
+
+        localStream
+            .getTracks()
+            .forEach(track => {
+
+                peerConnection.addTrack(
+                    track,
+                    localStream
+                );
+
+            });
+
+    }
+
+
+    /*
+    ----------------------------------------------
+    REMOTE TRACK
+    ----------------------------------------------
+    */
+
+    peerConnection.ontrack =
+        async event => {
+
+            console.log(
+                "REMOTE TRACK:",
+                event
+            );
+
+
+            if (
+                event.streams &&
+                event.streams[0]
+            ) {
+
+                remoteVideo.srcObject =
+                    event.streams[0];
+
+
+                /*
+                iPhone/Safari can require an
+                explicit play attempt.
+                */
+
+                try {
+
+                    await remoteVideo.play();
+
+                } catch (error) {
+
+                    console.log(
+                        "REMOTE PLAY:",
+                        error
+                    );
+
                 }
 
-            ]
+            }
 
         };
 
 
-        /* =====================================================
-           CAMERA + MICROPHONE
-        ===================================================== */
+    /*
+    ----------------------------------------------
+    ICE
+    ----------------------------------------------
+    */
 
-        async function requestMedia() {
-
-            permissionBtn.disabled = true;
-
-            permissionBtn.innerText =
-                "Requesting permission...";
-
-            permissionStatus.innerText =
-                "Camera aur microphone permission allow karo.";
-
-
-            if (!window.isSecureContext) {
-
-                permissionStatus.innerText =
-                    "❌ HTTPS required hai.";
-
-                permissionBtn.disabled = false;
-
-                permissionBtn.innerText =
-                    "Try Again";
-
-                return;
-            }
-
+    peerConnection.onicecandidate =
+        event => {
 
             if (
-                !navigator.mediaDevices ||
-                !navigator.mediaDevices.getUserMedia
+                event.candidate &&
+                partnerSid
             ) {
 
-                permissionStatus.innerText =
-                    "❌ Browser camera/microphone support nahi karta.";
+                socket.emit(
+                    "ice_candidate",
+                    {
+                        target: partnerSid,
+                        candidate: event.candidate
+                    }
+                );
 
-                permissionBtn.disabled = false;
-
-                permissionBtn.innerText =
-                    "Try Again";
-
-                return;
             }
 
+        };
+
+
+    /*
+    ----------------------------------------------
+    CONNECTION STATE
+    ----------------------------------------------
+    */
+
+    peerConnection.onconnectionstatechange =
+        () => {
+
+            if (!peerConnection) {
+
+                return;
+
+            }
+
+
+            const state =
+                peerConnection.connectionState;
+
+
+            console.log(
+                "WEBRTC STATE:",
+                state
+            );
+
+
+            if (state === "connected") {
+
+                setStatus(
+                    "🟢 Connected with a random person"
+                );
+
+            }
+
+
+            else if (state === "connecting") {
+
+                setStatus(
+                    "🔄 Connecting video..."
+                );
+
+            }
+
+
+            else if (state === "disconnected") {
+
+                setStatus(
+                    "⚠️ Connection interrupted..."
+                );
+
+            }
+
+
+            else if (state === "failed") {
+
+                setStatus(
+                    "❌ Video connection failed. Try Next."
+                );
+
+            }
+
+        };
+
+
+    /*
+    ----------------------------------------------
+    ICE CONNECTION STATE
+    ----------------------------------------------
+    */
+
+    peerConnection.oniceconnectionstatechange =
+        () => {
+
+            if (!peerConnection) {
+
+                return;
+
+            }
+
+            console.log(
+                "ICE STATE:",
+                peerConnection.iceConnectionState
+            );
+
+        };
+
+
+    return peerConnection;
+
+}
+
+
+/* ==================================================
+   ADD PENDING ICE
+================================================== */
+
+async function addPendingIce() {
+
+    if (!peerConnection) {
+
+        return;
+
+    }
+
+
+    for (
+        const candidate
+        of pendingIceCandidates
+    ) {
+
+        try {
+
+            await peerConnection.addIceCandidate(
+                new RTCIceCandidate(candidate)
+            );
+
+        } catch (error) {
+
+            console.error(
+                "PENDING ICE ERROR:",
+                error
+            );
+
+        }
+
+    }
+
+
+    pendingIceCandidates = [];
+
+}
+
+
+/* ==================================================
+   WAITING
+================================================== */
+
+socket.on(
+    "waiting",
+    () => {
+
+        searching = true;
+
+        setStatus(
+            "⏳ Waiting for another person..."
+        );
+
+    }
+);
+
+
+/* ==================================================
+   MATCHED
+================================================== */
+
+socket.on(
+    "matched",
+    async data => {
+
+        searching = false;
+
+        partnerSid =
+            data.partner_sid;
+
+
+        setStatus(
+            "🎉 Random person found! Connecting..."
+        );
+
+
+        createPeerConnection();
+
+
+        /*
+        ------------------------------------------
+        INITIATOR
+        ------------------------------------------
+        */
+
+        if (data.initiator) {
 
             try {
 
-                localStream =
-                    await navigator.mediaDevices.getUserMedia({
+                const offer =
+                    await peerConnection.createOffer({
 
-                        video: {
-                            width: {
-                                ideal: 1280
-                            },
-                            height: {
-                                ideal: 720
-                            },
-                            facingMode: "user"
-                        },
+                        offerToReceiveAudio: true,
 
-                        audio: {
-                            echoCancellation: true,
-                            noiseSuppression: true,
-                            autoGainControl: true
-                        }
+                        offerToReceiveVideo: true
 
                     });
 
 
-                console.log(
-                    "CAMERA/MIC PERMISSION GRANTED"
+                await peerConnection.setLocalDescription(
+                    offer
                 );
 
 
-                console.log(
-                    "Video tracks:",
-                    localStream.getVideoTracks()
+                socket.emit(
+                    "offer",
+                    {
+                        target: partnerSid,
+
+                        offer:
+                            peerConnection.localDescription
+                    }
                 );
 
-
-                console.log(
-                    "Audio tracks:",
-                    localStream.getAudioTracks()
-                );
-
-
-                localVideo.srcObject =
-                    localStream;
-
-
-                localVideo.muted = true;
-
-                localVideo.playsInline = true;
-
-
-                await localVideo.play();
-
-
-                permissionScreen.style.display =
-                    "none";
-
-                mainApp.style.display =
-                    "block";
-
-
-                statusText.innerText =
-                    "🔎 Finding a random person...";
-
-
-                searching = true;
-
-
-                if (socket.connected) {
-
-                    socket.emit(
-                        "find_random"
-                    );
-
-                } else {
-
-                    statusText.innerText =
-                        "⏳ Connecting to server...";
-
-                }
 
             } catch (error) {
 
                 console.error(
-                    "MEDIA ERROR:",
+                    "OFFER ERROR:",
                     error
                 );
 
-
-                if (
-                    error.name ===
-                    "NotAllowedError"
-                ) {
-
-                    permissionStatus.innerText =
-                        "❌ Camera/Microphone permission denied. Browser settings mein dono ko Allow karo.";
-
-                }
-
-                else if (
-                    error.name ===
-                    "NotFoundError"
-                ) {
-
-                    permissionStatus.innerText =
-                        "❌ Camera ya microphone device nahi mila.";
-
-                }
-
-                else if (
-                    error.name ===
-                    "NotReadableError"
-                ) {
-
-                    permissionStatus.innerText =
-                        "❌ Camera/microphone kisi aur application mein use ho raha hai.";
-
-                }
-
-                else if (
-                    error.name ===
-                    "SecurityError"
-                ) {
-
-                    permissionStatus.innerText =
-                        "❌ Browser ne camera/microphone access block kiya.";
-
-                }
-
-                else {
-
-                    permissionStatus.innerText =
-                        "❌ " +
-                        error.name +
-                        ": " +
-                        error.message;
-
-                }
-
-
-                permissionBtn.disabled = false;
-
-                permissionBtn.innerText =
-                    "🎥 Try Again";
+                setStatus(
+                    "❌ Could not create video connection."
+                );
 
             }
 
         }
 
-
-        permissionBtn.addEventListener(
-            "click",
-            requestMedia
-        );
+    }
+);
 
 
-        /* =====================================================
-           CREATE PEER CONNECTION
-        ===================================================== */
+/* ==================================================
+   OFFER
+================================================== */
 
-        function createPeerConnection() {
+socket.on(
+    "offer",
+    async data => {
 
-            closePeerConnection();
-
-
-            remoteDescriptionReady = false;
-
-            pendingIceCandidates = [];
+        partnerSid =
+            data.from;
 
 
-            peerConnection =
-                new RTCPeerConnection(
-                    rtcConfig
-                );
+        if (!peerConnection) {
 
-
-            if (localStream) {
-
-                localStream
-                    .getTracks()
-                    .forEach(track => {
-
-                        peerConnection.addTrack(
-                            track,
-                            localStream
-                        );
-
-                    });
-
-            }
-
-
-            peerConnection.ontrack =
-                event => {
-
-                    console.log(
-                        "REMOTE TRACK RECEIVED"
-                    );
-
-
-                    if (
-                        event.streams &&
-                        event.streams[0]
-                    ) {
-
-                        remoteVideo.srcObject =
-                            event.streams[0];
-
-                    }
-
-                };
-
-
-            peerConnection.onicecandidate =
-                event => {
-
-                    if (
-                        event.candidate &&
-                        partnerSid
-                    ) {
-
-                        socket.emit(
-                            "ice_candidate",
-                            {
-
-                                target:
-                                    partnerSid,
-
-                                candidate:
-                                    event.candidate
-
-                            }
-                        );
-
-                    }
-
-                };
-
-
-            peerConnection.onconnectionstatechange =
-                () => {
-
-                    if (!peerConnection) {
-                        return;
-                    }
-
-
-                    const state =
-                        peerConnection.connectionState;
-
-
-                    console.log(
-                        "WebRTC state:",
-                        state
-                    );
-
-
-                    if (state === "connected") {
-
-                        statusText.innerText =
-                            "🟢 Connected with a random person";
-
-                    }
-
-
-                    if (state === "connecting") {
-
-                        statusText.innerText =
-                            "🔗 Connecting video and microphone...";
-
-                    }
-
-
-                    if (state === "failed") {
-
-                        statusText.innerText =
-                            "❌ Video connection failed.";
-
-                    }
-
-
-                    if (state === "disconnected") {
-
-                        statusText.innerText =
-                            "⚠️ Connection disconnected.";
-
-                    }
-
-                };
-
-
-            return peerConnection;
+            createPeerConnection();
 
         }
 
 
-        /* =====================================================
-           PENDING ICE
-        ===================================================== */
+        try {
 
-        async function addPendingIce() {
-
-            if (!peerConnection) {
-                return;
-            }
+            await peerConnection.setRemoteDescription(
+                new RTCSessionDescription(
+                    data.offer
+                )
+            );
 
 
-            for (
-                const candidate
-                of pendingIceCandidates
-            ) {
+            remoteDescriptionReady =
+                true;
 
-                try {
 
-                    await peerConnection.addIceCandidate(
-                        new RTCIceCandidate(
-                            candidate
-                        )
-                    );
+            await addPendingIce();
 
-                } catch (error) {
 
-                    console.error(
-                        "PENDING ICE ERROR:",
-                        error
-                    );
+            const answer =
+                await peerConnection.createAnswer();
 
+
+            await peerConnection.setLocalDescription(
+                answer
+            );
+
+
+            socket.emit(
+                "answer",
+                {
+                    target: partnerSid,
+
+                    answer:
+                        peerConnection.localDescription
                 }
+            );
 
-            }
+
+        } catch (error) {
+
+            console.error(
+                "OFFER HANDLE ERROR:",
+                error
+            );
+
+            setStatus(
+                "❌ Video negotiation failed."
+            );
+
+        }
+
+    }
+);
 
 
-            pendingIceCandidates = [];
+/* ==================================================
+   ANSWER
+================================================== */
+
+socket.on(
+    "answer",
+    async data => {
+
+        if (!peerConnection) {
+
+            return;
 
         }
 
 
-        /* =====================================================
-           WAITING
-        ===================================================== */
+        try {
 
-        socket.on(
-            "waiting",
-            () => {
+            await peerConnection.setRemoteDescription(
+                new RTCSessionDescription(
+                    data.answer
+                )
+            );
 
-                searching = true;
 
-                statusText.innerText =
-                    "⏳ Waiting for another person...";
+            remoteDescriptionReady =
+                true;
 
-            }
-        );
 
+            await addPendingIce();
 
-        /* =====================================================
-           MATCHED
-        ===================================================== */
 
-        socket.on(
-            "matched",
-            async data => {
+        } catch (error) {
 
-                searching = false;
+            console.error(
+                "ANSWER ERROR:",
+                error
+            );
 
-                partnerSid =
-                    data.partner_sid;
-
-
-                statusText.innerText =
-                    "🎉 Random person found! Connecting...";
-
-
-                createPeerConnection();
-
-
-                if (data.initiator) {
-
-                    try {
-
-                        const offer =
-                            await peerConnection.createOffer();
-
-
-                        await peerConnection.setLocalDescription(
-                            offer
-                        );
-
-
-                        socket.emit(
-                            "offer",
-                            {
-
-                                target:
-                                    partnerSid,
-
-                                offer:
-                                    peerConnection.localDescription
-
-                            }
-                        );
-
-
-                    } catch (error) {
-
-                        console.error(
-                            "OFFER ERROR:",
-                            error
-                        );
-
-                    }
-
-                }
-
-            }
-        );
-
-
-        /* =====================================================
-           OFFER
-        ===================================================== */
-
-        socket.on(
-            "offer",
-            async data => {
-
-                partnerSid =
-                    data.from;
-
-
-                if (!peerConnection) {
-
-                    createPeerConnection();
-
-                }
-
-
-                try {
-
-                    await peerConnection.setRemoteDescription(
-                        new RTCSessionDescription(
-                            data.offer
-                        )
-                    );
-
-
-                    remoteDescriptionReady =
-                        true;
-
-
-                    await addPendingIce();
-
-
-                    const answer =
-                        await peerConnection.createAnswer();
-
-
-                    await peerConnection.setLocalDescription(
-                        answer
-                    );
-
-
-                    socket.emit(
-                        "answer",
-                        {
-
-                            target:
-                                partnerSid,
-
-                            answer:
-                                peerConnection.localDescription
-
-                        }
-                    );
-
-
-                } catch (error) {
-
-                    console.error(
-                        "OFFER HANDLING ERROR:",
-                        error
-                    );
-
-                }
-
-            }
-        );
-
-
-        /* =====================================================
-           ANSWER
-        ===================================================== */
-
-        socket.on(
-            "answer",
-            async data => {
-
-                if (!peerConnection) {
-                    return;
-                }
-
-
-                try {
-
-                    await peerConnection.setRemoteDescription(
-                        new RTCSessionDescription(
-                            data.answer
-                        )
-                    );
-
-
-                    remoteDescriptionReady =
-                        true;
-
-
-                    await addPendingIce();
-
-
-                } catch (error) {
-
-                    console.error(
-                        "ANSWER ERROR:",
-                        error
-                    );
-
-                }
-
-            }
-        );
-
-
-        /* =====================================================
-           ICE CANDIDATE
-        ===================================================== */
-
-        socket.on(
-            "ice_candidate",
-            async data => {
-
-                if (!peerConnection) {
-                    return;
-                }
-
-
-                if (!remoteDescriptionReady) {
-
-                    pendingIceCandidates.push(
-                        data.candidate
-                    );
-
-                    return;
-
-                }
-
-
-                try {
-
-                    await peerConnection.addIceCandidate(
-                        new RTCIceCandidate(
-                            data.candidate
-                        )
-                    );
-
-                } catch (error) {
-
-                    console.error(
-                        "ICE ERROR:",
-                        error
-                    );
-
-                }
-
-            }
-        );
-
-
-        /* =====================================================
-           MICROPHONE
-        ===================================================== */
-
-        micBtn.addEventListener(
-            "click",
-            () => {
-
-                if (!localStream) {
-                    return;
-                }
-
-
-                const track =
-                    localStream
-                        .getAudioTracks()[0];
-
-
-                if (!track) {
-                    return;
-                }
-
-
-                track.enabled =
-                    !track.enabled;
-
-
-                micBtn.innerText =
-                    track.enabled
-                        ? "🎤 Mic On"
-                        : "🔇 Mic Off";
-
-            }
-        );
-
-
-        /* =====================================================
-           CAMERA
-        ===================================================== */
-
-        cameraBtn.addEventListener(
-            "click",
-            () => {
-
-                if (!localStream) {
-                    return;
-                }
-
-
-                const track =
-                    localStream
-                        .getVideoTracks()[0];
-
-
-                if (!track) {
-                    return;
-                }
-
-
-                track.enabled =
-                    !track.enabled;
-
-
-                cameraBtn.innerText =
-                    track.enabled
-                        ? "📹 Camera On"
-                        : "🚫 Camera Off";
-
-            }
-        );
-
-
-        /* =====================================================
-           FIND RANDOM
-        ===================================================== */
-
-        findBtn.addEventListener(
-            "click",
-            () => {
-
-                if (!localStream) {
-                    return;
-                }
-
-
-                if (!socket.connected) {
-
-                    statusText.innerText =
-                        "❌ Server se connection nahi hai.";
-
-                    return;
-
-                }
-
-
-                if (searching) {
-                    return;
-                }
-
-
-                closePeerConnection();
-
-                partnerSid = null;
-
-                searching = true;
-
-
-                statusText.innerText =
-                    "🔎 Finding random person...";
-
-
-                socket.emit(
-                    "find_random"
-                );
-
-            }
-        );
-
-
-        /* =====================================================
-           NEXT
-        ===================================================== */
-
-        nextBtn.addEventListener(
-            "click",
-            () => {
-
-                if (partnerSid) {
-
-                    socket.emit(
-                        "end_call",
-                        {
-                            target:
-                                partnerSid
-                        }
-                    );
-
-                }
-
-
-                closePeerConnection();
-
-                partnerSid = null;
-
-                searching = true;
-
-
-                statusText.innerText =
-                    "🔎 Finding another random person...";
-
-
-                socket.emit(
-                    "find_random"
-                );
-
-            }
-        );
-
-
-        /* =====================================================
-           END
-        ===================================================== */
-
-        endBtn.addEventListener(
-            "click",
-            () => {
-
-                if (partnerSid) {
-
-                    socket.emit(
-                        "end_call",
-                        {
-                            target:
-                                partnerSid
-                        }
-                    );
-
-                }
-
-
-                closePeerConnection();
-
-                partnerSid = null;
-
-                searching = false;
-
-
-                statusText.innerText =
-                    "Call ended.";
-
-            }
-        );
-
-
-        /* =====================================================
-           PARTNER ENDED
-        ===================================================== */
-
-        socket.on(
-            "partner_ended",
-            () => {
-
-                closePeerConnection();
-
-                partnerSid = null;
-
-                searching = false;
-
-
-                statusText.innerText =
-                    "👋 The other person ended the call.";
-
-            }
-        );
-
-
-        /* =====================================================
-           SOCKET CONNECTED
-        ===================================================== */
-
-        socket.on(
-            "connect",
-            () => {
-
-                console.log(
-                    "SOCKET CONNECTED:",
-                    socket.id
-                );
-
-
-                if (
-                    localStream &&
-                    !searching
-                ) {
-
-                    searching = true;
-
-                    socket.emit(
-                        "find_random"
-                    );
-
-                }
-
-            }
-        );
-
-
-        /* =====================================================
-           SOCKET ERROR
-        ===================================================== */
-
-        socket.on(
-            "connect_error",
-            error => {
-
-                console.error(
-                    "SOCKET CONNECTION ERROR:",
-                    error
-                );
-
-
-                statusText.innerText =
-                    "❌ Server connection problem.";
-
-            }
-        );
-
-
-        /* =====================================================
-           SOCKET DISCONNECT
-        ===================================================== */
-
-        socket.on(
-            "disconnect",
-            reason => {
-
-                console.log(
-                    "SOCKET DISCONNECTED:",
-                    reason
-                );
-
-            }
-        );
-
-
-        /* =====================================================
-           CLOSE PEER
-        ===================================================== */
-
-        function closePeerConnection() {
-
-            if (peerConnection) {
-
-                peerConnection.close();
-
-                peerConnection = null;
-
-            }
-
-
-            remoteVideo.srcObject =
-                null;
+            setStatus(
+                "❌ Answer connection failed."
+            );
 
         }
 
-    </script>
+    }
+);
+
+
+/* ==================================================
+   ICE CANDIDATE
+================================================== */
+
+socket.on(
+    "ice_candidate",
+    async data => {
+
+        if (!peerConnection) {
+
+            return;
+
+        }
+
+
+        if (!remoteDescriptionReady) {
+
+            pendingIceCandidates.push(
+                data.candidate
+            );
+
+            return;
+
+        }
+
+
+        try {
+
+            await peerConnection.addIceCandidate(
+                new RTCIceCandidate(
+                    data.candidate
+                )
+            );
+
+        } catch (error) {
+
+            console.error(
+                "ICE ERROR:",
+                error
+            );
+
+        }
+
+    }
+);
+
+
+/* ==================================================
+   ALREADY CONNECTED
+================================================== */
+
+socket.on(
+    "already_connected",
+    data => {
+
+        partnerSid =
+            data.partner_sid;
+
+        searching = false;
+
+        setStatus(
+            "🟢 You are already connected."
+        );
+
+    }
+);
+
+
+/* ==================================================
+   MICROPHONE
+================================================== */
+
+micBtn.addEventListener(
+    "click",
+    () => {
+
+        if (!localStream) {
+
+            return;
+
+        }
+
+
+        const track =
+            localStream.getAudioTracks()[0];
+
+
+        if (!track) {
+
+            return;
+
+        }
+
+
+        track.enabled =
+            !track.enabled;
+
+
+        micBtn.innerText =
+            track.enabled
+                ? "🎤 Mic On"
+                : "🔇 Mic Off";
+
+    }
+);
+
+
+/* ==================================================
+   CAMERA
+================================================== */
+
+cameraBtn.addEventListener(
+    "click",
+    () => {
+
+        if (!localStream) {
+
+            return;
+
+        }
+
+
+        const track =
+            localStream.getVideoTracks()[0];
+
+
+        if (!track) {
+
+            return;
+
+        }
+
+
+        track.enabled =
+            !track.enabled;
+
+
+        cameraBtn.innerText =
+            track.enabled
+                ? "📹 Camera On"
+                : "🚫 Camera Off";
+
+    }
+);
+
+
+/* ==================================================
+   FIND RANDOM
+================================================== */
+
+findBtn.addEventListener(
+    "click",
+    () => {
+
+        if (!localStream) {
+
+            return;
+
+        }
+
+
+        if (!socket.connected) {
+
+            setStatus(
+                "🔄 Connecting to server..."
+            );
+
+            socket.connect();
+
+            return;
+
+        }
+
+
+        if (searching) {
+
+            return;
+
+        }
+
+
+        closePeerConnection();
+
+        partnerSid = null;
+
+        searching = true;
+
+
+        setStatus(
+            "🔎 Finding random person..."
+        );
+
+
+        socket.emit(
+            "find_random"
+        );
+
+    }
+);
+
+
+/* ==================================================
+   NEXT
+================================================== */
+
+nextBtn.addEventListener(
+    "click",
+    () => {
+
+        if (!localStream) {
+
+            return;
+
+        }
+
+
+        if (partnerSid) {
+
+            socket.emit(
+                "end_call",
+                {
+                    target: partnerSid
+                }
+            );
+
+        }
+
+
+        closePeerConnection();
+
+        partnerSid = null;
+
+        searching = true;
+
+
+        setStatus(
+            "🔎 Finding another person..."
+        );
+
+
+        if (!socket.connected) {
+
+            socket.connect();
+
+            return;
+
+        }
+
+
+        socket.emit(
+            "find_random"
+        );
+
+    }
+);
+
+
+/* ==================================================
+   END
+================================================== */
+
+endBtn.addEventListener(
+    "click",
+    () => {
+
+        if (partnerSid) {
+
+            socket.emit(
+                "end_call",
+                {
+                    target: partnerSid
+                }
+            );
+
+        }
+
+
+        closePeerConnection();
+
+        partnerSid = null;
+
+        searching = false;
+
+
+        setStatus(
+            "Call ended."
+        );
+
+    }
+);
+
+
+/* ==================================================
+   PARTNER ENDED
+================================================== */
+
+socket.on(
+    "partner_ended",
+    () => {
+
+        closePeerConnection();
+
+        partnerSid = null;
+
+        searching = false;
+
+
+        setStatus(
+            "👋 The other person ended the call."
+        );
+
+    }
+);
+
+
+/* ==================================================
+   AUTH
+================================================== */
+
+socket.on(
+    "auth_required",
+    () => {
+
+        closePeerConnection();
+
+        searching = false;
+
+
+        setStatus(
+            "❌ Please login with Google first."
+        );
+
+    }
+);
+
+
+/* ==================================================
+   CLOSE PEER
+================================================== */
+
+function closePeerConnection() {
+
+    if (peerConnection) {
+
+        try {
+
+            peerConnection.ontrack = null;
+
+            peerConnection.onicecandidate = null;
+
+            peerConnection.close();
+
+        } catch (error) {
+
+            console.log(
+                "PEER CLOSE:",
+                error
+            );
+
+        }
+
+        peerConnection = null;
+
+    }
+
+
+    remoteDescriptionReady =
+        false;
+
+    pendingIceCandidates = [];
+
+    remoteVideo.srcObject =
+        null;
+
+}
+
+
+/* ==================================================
+   PAGE LEAVE
+================================================== */
+
+window.addEventListener(
+    "pagehide",
+    () => {
+
+        if (partnerSid) {
+
+            socket.emit(
+                "end_call",
+                {
+                    target: partnerSid
+                }
+            );
+
+        }
+
+        closePeerConnection();
+
+    }
+);
+
+</script>
 
 </body>
 
