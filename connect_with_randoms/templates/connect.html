@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 
@@ -13,8 +12,8 @@
 
     <title>Connect With Randoms</title>
 
-    <!-- Socket.IO client -->
-    <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+    <!-- Socket.IO Client -->
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 
     <style>
 
@@ -133,11 +132,6 @@
             background: #dc2626;
         }
 
-        #micBtn,
-        #cameraBtn {
-            background: #374151;
-        }
-
         #status {
             text-align: center;
             margin-top: 18px;
@@ -192,9 +186,7 @@
 
 <div class="page">
 
-    <h1>
-        Connect With Randoms
-    </h1>
+    <h1>Connect With Randoms</h1>
 
     <!-- CAMERA / MICROPHONE PERMISSION -->
 
@@ -203,9 +195,7 @@
         id="permissionBox"
     >
 
-        <h2>
-            🎥🎤 Camera & Microphone
-        </h2>
+        <h2>🎥🎤 Camera & Microphone</h2>
 
         <p>
 
@@ -214,9 +204,7 @@
 
             <br><br>
 
-            <b>
-                Allow Camera & Microphone
-            </b>
+            <b>Allow Camera & Microphone</b>
 
             button dabao aur browser mein
             <b>Allow</b> select karo.
@@ -247,7 +235,6 @@
                 autoplay
                 muted
                 playsinline
-                webkit-playsinline
             ></video>
 
         </div>
@@ -263,7 +250,6 @@
                 id="remoteVideo"
                 autoplay
                 playsinline
-                webkit-playsinline
             ></video>
 
         </div>
@@ -316,33 +302,20 @@
 <script>
 
     // ====================================================
-    // RENDER FLASK-SOCKETIO SERVER
+    // SOCKET.IO
     // ====================================================
 
-    const SERVER_URL =
-        "https://elephant-app.onrender.com";
+    const socket = io("https://elephant-app.onrender.com", {
 
-
-    // ====================================================
-    // SOCKET.IO CONNECTION
-    // ====================================================
-
-    const socket = io(SERVER_URL, {
-
-        transports: [
-            "websocket",
-            "polling"
-        ],
+        transports: ["websocket", "polling"],
 
         upgrade: true,
 
         reconnection: true,
 
-        reconnectionAttempts: Infinity,
+        reconnectionAttempts: 10,
 
-        reconnectionDelay: 1000,
-
-        timeout: 20000
+        reconnectionDelay: 1000
 
     });
 
@@ -401,7 +374,7 @@
 
 
     // ====================================================
-    // WEBRTC CONFIG
+    // WEBRTC
     // ====================================================
 
     const rtcConfig = {
@@ -409,13 +382,11 @@
         iceServers: [
 
             {
-                urls:
-                    "stun:stun.l.google.com:19302"
+                urls: "stun:stun.l.google.com:19302"
             },
 
             {
-                urls:
-                    "stun:stun1.l.google.com:19302"
+                urls: "stun:stun1.l.google.com:19302"
             }
 
         ]
@@ -429,8 +400,7 @@
 
     function setStatus(message) {
 
-        statusText.textContent =
-            message;
+        statusText.textContent = message;
 
     }
 
@@ -443,15 +413,7 @@
 
         try {
 
-            if (
-                !window.isSecureContext
-            ) {
-
-                throw new Error(
-                    "HTTPS required"
-                );
-
-            }
+            console.log("Requesting camera/microphone...");
 
 
             if (
@@ -460,57 +422,44 @@
             ) {
 
                 throw new Error(
-                    "getUserMedia unavailable"
+                    "getUserMedia is not available"
                 );
 
             }
-
-
-            setStatus(
-                "Requesting camera and microphone permission..."
-            );
 
 
             localStream =
                 await navigator.mediaDevices.getUserMedia({
 
                     video: {
-
                         width: {
                             ideal: 1280
                         },
-
                         height: {
                             ideal: 720
                         },
-
                         facingMode: "user"
-
                     },
 
                     audio: {
-
                         echoCancellation: true,
-
                         noiseSuppression: true,
-
                         autoGainControl: true
-
                     }
 
                 });
+
+
+            console.log(
+                "Camera/Mic permission granted"
+            );
 
 
             localVideo.srcObject =
                 localStream;
 
 
-            localVideo.muted =
-                true;
-
-
-            await localVideo.play()
-                .catch(() => {});
+            await localVideo.play();
 
 
             permissionStatus.textContent =
@@ -524,16 +473,8 @@
                 "none";
 
 
-            micBtn.textContent =
-                "🎤 Mic On";
-
-
-            cameraBtn.textContent =
-                "📹 Camera On";
-
-
             setStatus(
-                "🟢 Ready. Click Find Random."
+                "Ready. Click Find Random."
             );
 
 
@@ -549,71 +490,44 @@
             );
 
 
-            let message =
-                "❌ Camera/Microphone permission failed.";
+            permissionStatus.style.color =
+                "#f87171";
 
 
             if (
-                error &&
-                error.name ===
-                "NotAllowedError"
+                error.name === "NotAllowedError"
             ) {
 
-                message =
-                    "❌ Permission denied. Browser site settings mein Camera aur Microphone ko Allow karo.";
+                permissionStatus.textContent =
+                    "❌ Permission denied. Browser address bar se Camera & Microphone Allow karo.";
 
             }
 
             else if (
-                error &&
-                error.name ===
-                "NotFoundError"
+                error.name === "NotFoundError"
             ) {
 
-                message =
-                    "❌ Camera ya Microphone device nahi mila.";
+                permissionStatus.textContent =
+                    "❌ Camera ya microphone device nahi mila.";
 
             }
 
             else if (
-                error &&
-                error.name ===
-                "NotReadableError"
+                error.name === "NotReadableError"
             ) {
 
-                message =
+                permissionStatus.textContent =
                     "❌ Camera/Microphone kisi doosre app mein use ho raha hai.";
 
             }
 
-            else if (
-                error &&
-                error.name ===
-                "SecurityError"
-            ) {
+            else {
 
-                message =
-                    "❌ Browser security ne Camera/Microphone block kar diya.";
+                permissionStatus.textContent =
+                    "❌ Camera/Microphone start nahi hua: " +
+                    error.message;
 
             }
-
-            else if (
-                error &&
-                error.message ===
-                "HTTPS required"
-            ) {
-
-                message =
-                    "❌ Camera/Microphone ke liye HTTPS required hai.";
-
-            }
-
-
-            permissionStatus.textContent =
-                message;
-
-            permissionStatus.style.color =
-                "#f87171";
 
 
             setStatus(
@@ -635,6 +549,74 @@
 
 
     // ====================================================
+    // SOCKET CONNECT
+    // ====================================================
+
+    socket.on(
+        "connect",
+        () => {
+
+            console.log(
+                "Socket connected:",
+                socket.id
+            );
+
+
+            console.log(
+                "Transport:",
+                socket.io.engine.transport.name
+            );
+
+
+            setStatus(
+                "🟢 Server connected. Allow camera & microphone."
+            );
+
+        }
+    );
+
+
+    // ====================================================
+    // SOCKET ERROR
+    // ====================================================
+
+    socket.on(
+        "connect_error",
+        error => {
+
+            console.error(
+                "SOCKET ERROR:",
+                error
+            );
+
+
+            setStatus(
+                "⚠️ Server connection problem."
+            );
+
+        }
+    );
+
+
+    socket.on(
+        "disconnect",
+        reason => {
+
+            console.warn(
+                "Socket disconnected:",
+                reason
+            );
+
+
+            setStatus(
+                "⚠️ Server connection lost. Reconnecting..."
+            );
+
+        }
+    );
+
+
+    // ====================================================
     // CREATE PEER CONNECTION
     // ====================================================
 
@@ -642,17 +624,7 @@
 
         if (peerConnection) {
 
-            try {
-
-                peerConnection.close();
-
-            }
-
-            catch (error) {
-
-                console.error(error);
-
-            }
+            peerConnection.close();
 
         }
 
@@ -667,16 +639,14 @@
 
             localStream
                 .getTracks()
-                .forEach(
-                    track => {
+                .forEach(track => {
 
-                        peerConnection.addTrack(
-                            track,
-                            localStream
-                        );
+                    peerConnection.addTrack(
+                        track,
+                        localStream
+                    );
 
-                    }
-                );
+                });
 
         }
 
@@ -692,9 +662,7 @@
                     remoteVideo.srcObject =
                         event.streams[0];
 
-
-                    remoteVideo
-                        .play()
+                    remoteVideo.play()
                         .catch(() => {});
 
                 }
@@ -732,25 +700,18 @@
             () => {
 
                 if (!peerConnection) {
-
                     return;
-
                 }
 
 
-                const state =
-                    peerConnection
-                        .connectionState;
-
-
                 console.log(
-                    "WEBRTC STATE:",
-                    state
+                    "WebRTC:",
+                    peerConnection.connectionState
                 );
 
 
                 if (
-                    state ===
+                    peerConnection.connectionState ===
                     "connected"
                 ) {
 
@@ -758,25 +719,17 @@
                         "🟢 Connected!"
                     );
 
-                    isSearching =
-                        false;
-
                 }
 
 
                 if (
-                    state ===
-                    "disconnected"
-                    ||
-                    state ===
+                    peerConnection.connectionState ===
                     "failed"
-                    ||
-                    state ===
-                    "closed"
                 ) {
 
-                    remoteVideo.srcObject =
-                        null;
+                    setStatus(
+                        "❌ Video connection failed."
+                    );
 
                 }
 
@@ -802,14 +755,12 @@
 
 
         const offer =
-            await peerConnection
-                .createOffer();
+            await peerConnection.createOffer();
 
 
-        await peerConnection
-            .setLocalDescription(
-                offer
-            );
+        await peerConnection.setLocalDescription(
+            offer
+        );
 
 
         socket.emit(
@@ -829,79 +780,6 @@
 
 
     // ====================================================
-    // SOCKET CONNECT
-    // ====================================================
-
-    socket.on(
-        "connect",
-        () => {
-
-            console.log(
-                "Socket connected:",
-                socket.id
-            );
-
-
-            console.log(
-                "Socket transport:",
-                socket.io.engine
-                    .transport.name
-            );
-
-
-            setStatus(
-                "🟢 Server connected. Ready."
-            );
-
-        }
-    );
-
-
-    // ====================================================
-    // SOCKET DISCONNECT
-    // ====================================================
-
-    socket.on(
-        "disconnect",
-        reason => {
-
-            console.warn(
-                "Socket disconnected:",
-                reason
-            );
-
-
-            setStatus(
-                "⚠️ Server connection lost. Reconnecting..."
-            );
-
-        }
-    );
-
-
-    // ====================================================
-    // SOCKET ERROR
-    // ====================================================
-
-    socket.on(
-        "connect_error",
-        error => {
-
-            console.error(
-                "SOCKET CONNECTION ERROR:",
-                error
-            );
-
-
-            setStatus(
-                "⚠️ Server connection problem."
-            );
-
-        }
-    );
-
-
-    // ====================================================
     // AUTH REQUIRED
     // ====================================================
 
@@ -918,7 +796,7 @@
                 () => {
 
                     window.location.href =
-                        "https://connectwithrandom.netlify.app/";
+                        "/";
 
                 },
                 1200
@@ -951,13 +829,6 @@
             }
 
 
-            if (isSearching) {
-
-                return;
-
-            }
-
-
             if (!socket.connected) {
 
                 setStatus(
@@ -969,8 +840,14 @@
             }
 
 
-            isSearching =
-                true;
+            if (isSearching) {
+
+                return;
+
+            }
+
+
+            isSearching = true;
 
 
             setStatus(
@@ -994,8 +871,7 @@
         "waiting",
         () => {
 
-            isSearching =
-                true;
+            isSearching = true;
 
 
             setStatus(
@@ -1049,11 +925,6 @@
                         error
                     );
 
-
-                    setStatus(
-                        "Could not start video connection."
-                    );
-
                 }
 
             }
@@ -1063,31 +934,7 @@
 
 
     // ====================================================
-    // ALREADY CONNECTED
-    // ====================================================
-
-    socket.on(
-        "already_connected",
-        data => {
-
-            partnerSid =
-                data.partner_sid;
-
-
-            isSearching =
-                false;
-
-
-            setStatus(
-                "You are already connected."
-            );
-
-        }
-    );
-
-
-    // ====================================================
-    // RECEIVE OFFER
+    // OFFER
     // ====================================================
 
     socket.on(
@@ -1107,23 +954,20 @@
                 }
 
 
-                await peerConnection
-                    .setRemoteDescription(
-                        new RTCSessionDescription(
-                            data.offer
-                        )
-                    );
+                await peerConnection.setRemoteDescription(
+                    new RTCSessionDescription(
+                        data.offer
+                    )
+                );
 
 
                 const answer =
-                    await peerConnection
-                        .createAnswer();
+                    await peerConnection.createAnswer();
 
 
-                await peerConnection
-                    .setLocalDescription(
-                        answer
-                    );
+                await peerConnection.setLocalDescription(
+                    answer
+                );
 
 
                 socket.emit(
@@ -1160,7 +1004,7 @@
 
 
     // ====================================================
-    // RECEIVE ANSWER
+    // ANSWER
     // ====================================================
 
     socket.on(
@@ -1170,18 +1014,15 @@
             try {
 
                 if (!peerConnection) {
-
                     return;
-
                 }
 
 
-                await peerConnection
-                    .setRemoteDescription(
-                        new RTCSessionDescription(
-                            data.answer
-                        )
-                    );
+                await peerConnection.setRemoteDescription(
+                    new RTCSessionDescription(
+                        data.answer
+                    )
+                );
 
 
                 setStatus(
@@ -1193,7 +1034,7 @@
             catch (error) {
 
                 console.error(
-                    "REMOTE ANSWER ERROR:",
+                    "ANSWER RECEIVE ERROR:",
                     error
                 );
 
@@ -1204,7 +1045,7 @@
 
 
     // ====================================================
-    // RECEIVE ICE
+    // ICE
     // ====================================================
 
     socket.on(
@@ -1214,18 +1055,15 @@
             try {
 
                 if (!peerConnection) {
-
                     return;
-
                 }
 
 
-                await peerConnection
-                    .addIceCandidate(
-                        new RTCIceCandidate(
-                            data.candidate
-                        )
-                    );
+                await peerConnection.addIceCandidate(
+                    new RTCIceCandidate(
+                        data.candidate
+                    )
+                );
 
             }
 
@@ -1243,7 +1081,7 @@
 
 
     // ====================================================
-    // CLOSE CURRENT CALL
+    // CLOSE CALL
     // ====================================================
 
     function closeCurrentCall() {
@@ -1262,9 +1100,7 @@
 
             }
 
-
-            peerConnection =
-                null;
+            peerConnection = null;
 
         }
 
@@ -1317,15 +1153,17 @@
 
     nextBtn.addEventListener(
         "click",
-        () => {
+        async () => {
 
-            if (!socket.connected) {
+            if (!localStream) {
 
-                setStatus(
-                    "⚠️ Server connection nahi hai."
-                );
+                const allowed =
+                    await requestMedia();
 
-                return;
+
+                if (!allowed) {
+                    return;
+                }
 
             }
 
@@ -1389,7 +1227,7 @@
             if (!localStream) {
 
                 setStatus(
-                    "Enable camera and microphone first."
+                    "Allow camera & microphone first."
                 );
 
                 return;
@@ -1397,14 +1235,15 @@
             }
 
 
-            const audioTracks =
-                localStream
-                    .getAudioTracks();
+            const tracks =
+                localStream.getAudioTracks();
 
 
-            if (
-                !audioTracks.length
-            ) {
+            if (!tracks.length) {
+
+                setStatus(
+                    "No microphone found."
+                );
 
                 return;
 
@@ -1412,11 +1251,10 @@
 
 
             const enabled =
-                !audioTracks[0]
-                    .enabled;
+                !tracks[0].enabled;
 
 
-            audioTracks.forEach(
+            tracks.forEach(
                 track => {
 
                     track.enabled =
@@ -1446,7 +1284,7 @@
             if (!localStream) {
 
                 setStatus(
-                    "Enable camera and microphone first."
+                    "Allow camera & microphone first."
                 );
 
                 return;
@@ -1454,14 +1292,15 @@
             }
 
 
-            const videoTracks =
-                localStream
-                    .getVideoTracks();
+            const tracks =
+                localStream.getVideoTracks();
 
 
-            if (
-                !videoTracks.length
-            ) {
+            if (!tracks.length) {
+
+                setStatus(
+                    "No camera found."
+                );
 
                 return;
 
@@ -1469,11 +1308,10 @@
 
 
             const enabled =
-                !videoTracks[0]
-                    .enabled;
+                !tracks[0].enabled;
 
 
-            videoTracks.forEach(
+            tracks.forEach(
                 track => {
 
                     track.enabled =
@@ -1499,9 +1337,7 @@
     setInterval(
         () => {
 
-            if (
-                socket.connected
-            ) {
+            if (socket.connected) {
 
                 socket.emit(
                     "heartbeat"
@@ -1515,7 +1351,7 @@
 
 
     // ====================================================
-    // BEFORE PAGE CLOSE
+    // PAGE CLOSE
     // ====================================================
 
     window.addEventListener(
@@ -1544,4 +1380,3 @@
 </body>
 
 </html>
-```
